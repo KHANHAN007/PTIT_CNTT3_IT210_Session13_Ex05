@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Chi tiết Đơn thuốc</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+        .navbar-nav .nav-link {
+            color: white !important;
+            margin: 0 10px;
+            border-radius: 5px;
+        }
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px 8px 0 0;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .badge {
+            border-radius: 20px;
+            padding: 5px 10px;
+        }
+        .info-section {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .medication-item {
+            background-color: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+        @media (max-width: 768px) {
+            .medication-item {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Quản Lý Đơn Thuốc</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/prescriptions">Danh sách Đơn thuốc</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/prescriptions/new">Thêm Đơn thuốc</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Chi tiết Đơn thuốc</h4>
+                <a href="/prescriptions" class="btn btn-light btn-sm">Quay lại</a>
+            </div>
+            <div class="card-body">
+\                <div class="info-section">
+                    <h5 class="mb-3">👤 Thông tin Bệnh nhân</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Mã BN:</strong> <span class="badge bg-primary" th:text="${prescription.patientCode}"></span></p>
+                            <p><strong>Tên:</strong> <span th:text="${prescription.patientName}"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Email:</strong> <span th:text="${prescription.patientEmail}"></span></p>
+                            <p><strong>Ngày cấp phát:</strong> <span th:text="${#temporals.format(prescription.issueDate, 'dd/MM/yyyy HH:mm')}"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danh sách Thuốc -->
+                <div class="info-section">
+                    <h5 class="mb-3">💊 Danh sách Thuốc</h5>
+                    <div th:if="${#lists.isEmpty(prescription.medications)}" class="alert alert-warning">
+                        Đơn thuốc này chưa có thuốc nào được ghi nhận.
+                    </div>
+                    <div th:unless="${#lists.isEmpty(prescription.medications)}">
+                        <div th:each="medication : ${prescription.medications}" class="medication-item">
+                            <div>
+                                <strong>Tên thuốc:</strong>
+                                <p th:text="${medication.name}"></p>
+                            </div>
+                            <div>
+                                <strong>Số lượng:</strong>
+                                <p><span class="badge bg-success" th:text="${medication.quantity}"></span> viên</p>
+                            </div>
+                            <div>
+                                <strong>Giá:</strong>
+                                <p th:text="${#numbers.formatCurrency(medication.price)}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end mt-4">
+                    <a th:href="@{/prescriptions/{id}/delete(id=${prescription.id})}"
+                       class="btn btn-danger"
+                       onclick="return confirm('Xác nhận xóa đơn thuốc này?')">🗑️ Xóa Đơn thuốc</a>
+                    <a href="/prescriptions" class="btn btn-secondary">Quay lại</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5 py-4 bg-light text-center text-muted">
+        <p>&copy; 2026 Quản Lý Đơn Thuốc - IT210 Session 13</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
